@@ -8,6 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 # module is a file containing Python definitions and statements.
 # In this case, data_cleaners is the module
+#%%
 from helper_functions.data_cleaners import apply_cat_labels
 from os import *
 # Important to recognize that this would also work
@@ -42,7 +43,7 @@ print("Original Date Variable: ", df.dtypes)
 
 # Remember loc is for booleans involving the columns of the
 # data frame and iloc is for indeces
-sept_df = df.loc[df["Date"] > "2021-08-31"]
+sept_df = df.loc[df["Date"] > "2022-01-31"]
 
 sept_df["Cost"].sum()
 
@@ -93,3 +94,4 @@ df_ts_grouped = df_timeseries.groupby([pd.Grouper(freq='M'), "Category"])
 
 df_ts_grouped.sum().head()
 # %%
+# Stacked Bar chart
