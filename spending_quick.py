@@ -41,17 +41,22 @@ print("Original Date Variable: ", df.dtypes)
 #%%
 # Remove months that aren't in September
 
+# This is extra stupid, but to get the floor with a datetime, you must convert 
+# to a period
+# first_of_month = pd.to_datetime('today').to_period('M').to_timestamp()
+first_of_month = pd.to_datetime('2022-02-01').to_period('M').to_timestamp()
+
 # Remember loc is for booleans involving the columns of the
 # data frame and iloc is for indeces
-sept_df = df.loc[df["Date"] > "2022-01-31"]
+current_df = df.loc[df["Date"] >= first_of_month]
 
-sept_df["Cost"].sum()
+current_df["Cost"].sum()
 
 #%%
 # Bar chart of categories
 
 # This grouped each row of the data frame then took the sum of the cost variable
-cost_table = sept_df.groupby(["Category"])["Cost"].sum()
+cost_table = current_df.groupby(["Category"])["Cost"].sum()
 
 fig, ax = plt.subplots(1,2)
 
@@ -60,9 +65,9 @@ cost_table.plot.barh(ax = ax[0])
 
 # I used a module to get the function apply_cat_labels
 # 
-sept_df["SpendCategory"] = apply_cat_labels(sept_df["Category"])
+current_df["SpendCategory"] = apply_cat_labels(sept_df["Category"])
 
-cost_table = sept_df.groupby(["SpendCategory"])["Cost"].sum()
+cost_table = current_df.groupby(["SpendCategory"])["Cost"].sum()
 
 # Remember, using matplotlibs subplots function, you indicate the overall figure
 # and the grid of axes. 
@@ -75,7 +80,7 @@ cost_table.plot.barh(ax = ax[1])
 
 # Applying multiple aggregation functions can be done using .agg
 
-cost_table = sept_df.groupby(["SpendCategory"]).agg({'Cost': ['mean', 'min', 'max']})
+cost_table = current_df.groupby(["SpendCategory"]).agg({'Cost': ['mean', 'min', 'max']})
 
 print("Cost Table:\n", cost_table)
 
@@ -86,12 +91,21 @@ print("Cost Table:\n", cost_table)
 # Looks like this may be easy. the datetime type should have an associated
 # bound function called .month()
 
-print(sept_df.columns)
+print(current_df.columns)
 
 df_timeseries = df.set_index(df["Date"].values)
 
 df_ts_grouped = df_timeseries.groupby([pd.Grouper(freq='M'), "Category"])
 
 df_ts_grouped.sum().head()
+
+agg_costs = df_ts_grouped.sum()
+print(agg_costs)
+# agg_costs.loc(agg_costs["Date"] == 2022)
 # %%
 # Stacked Bar chart
+df["SpendCategory"] = apply_cat_labels(df["Category"])
+
+cost_table = sept_df.groupby(["SpendCategory", df.index, df.index.year]).agg({'Cost': ['mean', 'min', 'max']})
+
+print("Cost Table:\n", cost_table)
