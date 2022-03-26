@@ -109,3 +109,5 @@ df["SpendCategory"] = apply_cat_labels(df["Category"])
 cost_table = sept_df.groupby(["SpendCategory", df.index, df.index.year]).agg({'Cost': ['mean', 'min', 'max']})
 
 print("Cost Table:\n", cost_table)
+
+
