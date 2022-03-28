@@ -6,9 +6,11 @@
 # remember where you came from
 import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.express as px
 # module is a file containing Python definitions and statements.
 # In this case, data_cleaners is the module
 #%%
+# Import local modules
 from helper_functions.data_cleaners import apply_cat_labels
 from os import *
 print(getcwd())
@@ -20,6 +22,7 @@ print(getcwd())
 # is loaded, you can access its elements using _module_name.element
 
 #%%
+# Read in Data
 # I had to specify the encoding in response to an error regarding a diacritic mark
 df = pd.read_csv('..\Data\Spending2017.csv', encoding  = "ISO-8859-1")
 
@@ -28,14 +31,14 @@ print(df.head())
 
 #%%
 # Print the variable types
-print("Original Date Variable: \n", df.dtypes)
+print("Before Transformation: \n", df.dtypes)
 
 # Change the date variable to datetime for sorting and filtering and whatnot
 df["Date"] = pd.to_datetime(df["Date"])
 
-df["SpendCategory"] = apply_cat_labels(df.loc[:, "Category"])
+df["SpendCategory"] = apply_cat_labels(df["Category"])
 
-print("New Date Variable: \n", df.dtypes)
+print("After Transformation: \n", df.dtypes)
 
 # I read in the Python for Data Science book today that for production code
 # you should always use the .loc and iloc functions in production code. 
@@ -82,10 +85,9 @@ cost_table.plot.barh(ax = ax[1])
 # Write a separate function to fill them out
 
 #%%
-
 # Applying multiple aggregation functions can be done using .agg
 
-cost_table = current_df.groupby(["SpendCategory"]).agg({'Cost': ['mean', 'min', 'max']})
+cost_table = current_df.groupby(["SpendCategory"]).agg({'Cost': ['count', 'sum', 'mean', 'min', 'max']})
 
 print("Cost Table:\n", cost_table)
 
@@ -100,7 +102,7 @@ print(current_df.columns)
 
 df_timeseries = df.set_index(df["Date"].values)
 
-df_ts_grouped = df_timeseries.groupby([pd.Grouper(freq='M'), "Category"])
+df_ts_grouped = df_timeseries.groupby([pd.Grouper(freq='M'), "SpendCategory"])
 
 df_ts_grouped.sum().head()
 
@@ -110,10 +112,8 @@ print(agg_costs)
 # agg_costs.loc(agg_costs["Date"] == 2022)
 #%%
 # Stacked Bar chart
-df["SpendCategory"] = apply_cat_labels(df["Category"])
+# To get this to run in iPython vscode I had to install both plotly and nbformat from the ipython terminal
 
-cost_table = sept_df.groupby(["SpendCategory", df.index, df.index.year]).agg({'Cost': ['mean', 'min', 'max']})
+fig = px.bar(agg_costs.reset_index(), x = "level_0", y = "Cost", color = "SpendCategory")
 
-print("Cost Table:\n", cost_table)
-
-
+fig.show()
