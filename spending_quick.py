@@ -65,7 +65,7 @@ cost_table.plot.barh(ax = ax[0])
 
 # I used a module to get the function apply_cat_labels
 # 
-current_df["SpendCategory"] = apply_cat_labels(sept_df["Category"])
+current_df["SpendCategory"] = apply_cat_labels(current_df["Category"])
 
 cost_table = current_df.groupby(["SpendCategory"])["Cost"].sum()
 
@@ -102,7 +102,7 @@ df_ts_grouped.sum().head()
 agg_costs = df_ts_grouped.sum()
 print(agg_costs)
 # agg_costs.loc(agg_costs["Date"] == 2022)
-# %%
+#%%
 # Stacked Bar chart
 df["SpendCategory"] = apply_cat_labels(df["Category"])
 
