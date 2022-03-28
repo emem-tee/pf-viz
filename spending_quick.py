@@ -11,11 +11,13 @@ import matplotlib.pyplot as plt
 #%%
 from helper_functions.data_cleaners import apply_cat_labels
 from os import *
+print(getcwd())
 # Important to recognize that this would also work
 # from helper_functions import data_cleaners
 # But if I did that, the functions from data_cleaners would not be loaded into
 # the global environment, so I'd have to access them through data_cleaners.whatever()
-print(getcwd())
+# This occurs because data_cleaners is a module, when a module
+# is loaded, you can access its elements using _module_name.element
 
 #%%
 # I had to specify the encoding in response to an error regarding a diacritic mark
@@ -26,12 +28,14 @@ print(df.head())
 
 #%%
 # Print the variable types
-print("Original Date Variable: ", df.dtypes)
+print("Original Date Variable: \n", df.dtypes)
 
 # Change the date variable to datetime for sorting and filtering and whatnot
 df["Date"] = pd.to_datetime(df["Date"])
 
-print("Original Date Variable: ", df.dtypes)
+df["SpendCategory"] = apply_cat_labels(df.loc[:, "Category"])
+
+print("New Date Variable: \n", df.dtypes)
 
 # I read in the Python for Data Science book today that for production code
 # you should always use the .loc and iloc functions in production code. 
@@ -39,18 +43,20 @@ print("Original Date Variable: ", df.dtypes)
 # things quickly.
 
 #%%
-# Remove months that aren't in September
+# Remove months that aren't in current month
 
 # This is extra stupid, but to get the floor with a datetime, you must convert 
 # to a period
 # first_of_month = pd.to_datetime('today').to_period('M').to_timestamp()
-first_of_month = pd.to_datetime('2022-02-01').to_period('M').to_timestamp()
+first_of_month = pd.to_datetime('today').to_period('M').to_timestamp()
 
 # Remember loc is for booleans involving the columns of the
 # data frame and iloc is for indeces
 current_df = df.loc[df["Date"] >= first_of_month]
 
-current_df["Cost"].sum()
+current_total = current_df["Cost"].sum()
+
+print(f"You spent ${current_total:.2f} in the month of {first_of_month}")
 
 #%%
 # Bar chart of categories
@@ -64,8 +70,7 @@ fig, ax = plt.subplots(1,2)
 cost_table.plot.barh(ax = ax[0])
 
 # I used a module to get the function apply_cat_labels
-# 
-current_df["SpendCategory"] = apply_cat_labels(current_df["Category"])
+# current_df["SpendCategory"] = apply_cat_labels(current_df.loc[:, "Category"])
 
 cost_table = current_df.groupby(["SpendCategory"])["Cost"].sum()
 
@@ -100,6 +105,7 @@ df_ts_grouped = df_timeseries.groupby([pd.Grouper(freq='M'), "Category"])
 df_ts_grouped.sum().head()
 
 agg_costs = df_ts_grouped.sum()
+
 print(agg_costs)
 # agg_costs.loc(agg_costs["Date"] == 2022)
 #%%

@@ -6,7 +6,6 @@ def apply_cat_labels(x_Series):
                         "Career",
                         "Eating Out",
                         "Fun",
-                        "Gas",
                         "Gift",
                         "Goods_Other",
                         "Grocery",
